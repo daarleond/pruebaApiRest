@@ -1,44 +1,288 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>To-do CRUD</title>
-    <link rel="stylesheet" href="css/site.css" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Importaciones de bootstrap-->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- Titulo de la ventana-->
+    <title>CRUD consumiendo API en NET CORE</title>
 </head>
 <body>
-    <h1>To-do CRUD</h1>
-    <h3>Add</h3>
-    <form action="javascript:void(0);" method="POST" onsubmit="addItem()">
-        <input type="text" id="add-name" placeholder="New to-do">
-        <input type="submit" value="Add">
-    </form>
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+          <div class="container-fluid">
+              <!-- Navbar de bootstrap-->
+            <a class="navbar-brand" href="#">CRUD consumiendo API en NET CORE | Parte 2. Test de Conocimientos</a>
+          </div>
+        </nav>
+      </div>
+      <div class="container">
+    <h1>Estudiantes | BSide</h1>
+    <hr>
 
-    <div id="editForm">
-        <h3>Edit</h3>
-        <form action="javascript:void(0);" onsubmit="updateItem()">
-            <input type="hidden" id="edit-id">
-            <input type="checkbox" id="edit-isComplete">
-            <input type="text" id="edit-name">
-            <input type="submit" value="Save">
-            <a onclick="closeInput()" aria-label="Close">&#10006;</a>
-        </form>
+
+<!-- Formulario para ingresar nuevos datos o editar los exitentes-->
+      
+    <form id="frm">
+        <div class="form-group">
+            <label for="ID">ID:</label>
+        <input type="text" class="form-control" name="ID" id="ID"> 
     </div>
+    <div class="form-group">
+        <label for="Nombre">Nombre:</label>
+        <input type="text" class="form-control" name="Nombre" id="Nombre">
+    </div>
+    <div class="form-group">
+        <label for="Edad">Edad:</label>
+        <input type="text" class="form-control" name="Edad" id="Edad">
+    </div>
+    <div class="form-group">
+        <label for="Sexo">Sexo:</label>
+        <input type="text" class="form-control" name="Sexo" id="Sexo">
+    </div>
+    <div class="form-group">
+        <label for="Telefono">Telefono:</label>
+        <input type="text" class="form-control" name="Telefono" id="Telefono">
+    </div>
+    <div class="form-group">
+        <label for="Grado">Grado:</label>
+        <input type="text" class="form-control" name="Grado" id="Grado">
+    </div>
+    <label class="form-check-label" for="gridCheck">
+       
+      </label>
 
-    <p id="counter"></p>
+      <div class="container">
+      <div class="btn-group">
+        <!-- Botones con las funciones Post y Edit-->
+            <button type="submit" class="btn btn-primary btn-rounded" value="Guardar" onclick="Post();">Guardar</button>
+        
+        
+            <button type="submit" class="btn btn-success btn-rounded" value="Guardar Acutalizacion" onclick="Edit();">Actualizar</button>
+        
+        </div>
 
-    <table>
-        <tr>
-            <th>Is Complete?</th>
-            <th>Name</th>
-            <th></th>
-            <th></th>
-        </tr>
-        <tbody id="todos"></tbody>
-    </table>
+    </div>
+        
+        
 
-    <script src="js/site.js" asp-append-version="true"></script>
-    <script type="text/javascript">
-        getItems();
-    </script>
+    </form>
+</div>
+<!-- Desplegando la Lista con los datos-->
+<div class="container">
+    <hr>
+    <div id="divLista"></div>
+
+</div>
+
+
+<!-- El footer con mis datos -->
+<footer class="bg-light text-center text-lg-start">
+    
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+      © 2021. Darío León Díaz. BSide
+  
+    </div>
+   
+  </footer>
 </body>
 </html>
+
+
+
+<script>
+
+//variable con la url de localhost (especificada en el backend en launchsettings.json)
+var url="http://localhost:17594/api/estudiantes";
+
+//metodo get para mostrar lista y botones
+Get();
+
+//funcion POST para añadir un nuevo registro asignando los valores del formulario
+function Post(){
+    fetch(url,{
+        method: "POST",
+        body: JSON.stringify({
+            ID: document.getElementById("ID").value,
+            Nombre: document.getElementById("Nombre").value,
+            Edad: document.getElementById("Edad").value,
+            Sexo: document.getElementById("Sexo").value,
+            Telefono: document.getElementById("Telefono").value,
+            Grado:document.getElementById("Grado").value}),
+        headers: {
+            'Accept':"application/json",
+            "Content-Type":"application/json"
+        }
+    }).then(function(response){
+        if(response.ok){
+            return response.text();
+            
+        }else{
+            alert("Error al ejecutar la solicitud");
+        }
+    }).then(function(Data){
+        console.log(Data);
+        
+       
+    //regresando los valores a vacio
+    document.getElementById("ID").value="";
+    document.getElementById("Nombre").value="";
+    document.getElementById("Edad").value="";
+    document.getElementById("Sexo").value="";
+    document.getElementById("Telefono").value="";
+    document.getElementById("Grado").value="";
+    document.location.reload();
+        
+    })
+}
+
+//funcion Delete para eliminar un registro asignando los valores del formulario recibe parametro ID
+function Delete(id){
+    
+    //fetch permite acceder y eliminar los datos
+    //se especifica la url y el id para saber que registro eliminar
+    fetch('http://localhost:17594/api/estudiantes/'+id ,{
+        method: "DELETE",
+
+        headers: {
+            'Accept':"application/json",
+            "Content-Type":"application/json"
+        }
+    }).then(function(response){
+        if(response.ok){
+            return response.text();
+            
+        }else{
+            alert("Error al ejecutar la solicitud");
+        }
+    }).then(function(Data){
+        console.log(Data);
+        document.location.reload();
+        
+    })
+
+}
+
+//funcion Edit que ocupa el metodo PUT para editar un registro 
+function Edit(){
+    //Se especifica el valor del ID para saber que registro editar
+    fetch('http://localhost:17594/api/estudiantes/'+document.getElementById("ID").value, {
+        method: "PUT",
+        body: JSON.stringify({
+            
+            ID: document.getElementById("ID").value,
+            Nombre: document.getElementById("Nombre").value,
+            Edad: document.getElementById("Edad").value,
+            Sexo: document.getElementById("Sexo").value,
+            Telefono: document.getElementById("Telefono").value,
+            Grado:document.getElementById("Grado").value}),
+        
+        headers: {
+            'Accept':"application/json",
+            "Content-Type":"application/json"
+        }
+    }).then(function(response){
+        if(response.ok){
+            return response.text();
+            
+        }else{
+            alert("Error al ejecutar la solicituded");
+        }
+    }).then(function(Data){
+        console.log(Data);
+        //Se regresan los valores a vacio
+        document.getElementById("ID").value="";
+        document.getElementById("Nombre").value="";
+        document.getElementById("Edad").value="";
+        document.getElementById("Sexo").value="";
+        document.getElementById("Telefono").value="";
+        document.getElementById("Grado").value="";
+        document.location.reload();
+
+        
+    })
+
+}
+
+//Funcion para rellenar los datos en el formulario y capturarlos
+function OpenEdit(ID,Nombre,Edad,Sexo,Telefono,Grado){
+    
+    document.getElementById("ID").value=ID;
+    document.getElementById("Nombre").value=Nombre;
+    document.getElementById("Edad").value=Edad;
+    document.getElementById("Sexo").value=Sexo;
+    document.getElementById("Telefono").value=Telefono;
+    document.getElementById("Grado").value=Grado;
+}
+
+//funcion GET
+function Get(){
+fetch(url).then(function(response){
+    return response.json();
+
+}).then(function(Data){
+    
+    document.getElementById("divLista").innerHTML;
+    for(i=0;i<Data.length;i++){
+        //se declaran las variables para desplegarse en pantalla
+        let divElement = document.createElement("div");
+        let divSpan = document.createElement("span");
+        //se crean los botones delete y edit
+        let divButtonDelete = document.createElement("button");
+        let divButtonEdit = document.createElement("button");
+
+        //se despliega mediante un ciclo los valores de cada registro
+        divSpan.innerHTML = Data[i].id+" "+Data[i].nombre+" "+Data[i].edad+" "+Data[i].sexo+" "+Data[i].telefono+" "+Data[i].grado;
+        //se despliega el nombre del boton eliminar
+        divButtonDelete.innerHTML="Eliminar";
+        //se obtiene el id de cada uno de los registros y lo captura la variable Miid
+        divButtonDelete.Miid=Data[i].id;
+        //se añade un nuevo evento al haccer click en el boton, el cual es eliminar por medio la funcion Delete
+        divButtonDelete.addEventListener("click",function(mibutton){
+            Delete(mibutton.target.Miid);
+        })
+        //se despliega el nombre del boton editar
+        divButtonEdit.innerHTML="Editar";
+        //se obtienen los datos de cada uno de los registros dependiendo de cual se quiere eliminar
+        divButtonEdit.Miid=Data[i].id;
+        divButtonEdit.Minombre=Data[i].nombre;
+        divButtonEdit.Miedad=Data[i].edad;
+        divButtonEdit.Misexo=Data[i].sexo;
+        divButtonEdit.Mitelefono=Data[i].telefono;
+        divButtonEdit.Migrado=Data[i].grado;
+    //se añade un nuevo evento al haccer click en el boton, el cual es eliminar por medio la funcion OpenEdit que rellenara los campos del formulario
+        divButtonEdit.addEventListener("click",function(mibutton){
+            OpenEdit(
+                mibutton.target.Miid,
+                mibutton.target.Minombre,
+                mibutton.target.Miedad,
+                mibutton.target.Misexo,
+                mibutton.target.Mitelefono,
+                mibutton.target.Migrado
+            );
+        })
+
+
+
+        divElement.appendChild(divSpan);
+        divElement.appendChild(divButtonDelete);
+        divElement.appendChild(divButtonEdit);
+        
+        document.getElementById("divLista").appendChild(divElement);
+        
+    }
+    
+;
+})
+}
+
+
+
+
+</script>
+
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js></script>
